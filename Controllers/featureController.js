@@ -374,7 +374,7 @@ exports.orderReport = async (req, res) => {
         .json({ status: false, message: "Please provide all dates" });
     }
     const sql = `
-      SELECT order_id, received_date, delivered_date ,order_items, address, name , order_status
+      SELECT order_id, received_date, delivered_date ,order_items,delivery_fee, address, name , order_status
       FROM customer_orders
       WHERE DATE(received_date) BETWEEN ? AND ?`;
     const results = await new Promise((resolve, reject) => {
