@@ -307,3 +307,57 @@ exports.downloadReport = async (req, res) => {
 //     });
 //   }
 // };
+
+exports.orderReport = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+    if (!startDate || !endDate) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Please provide all dates" });
+    }
+    const sql = `
+      SELECT order_id, received_date, delivered_date ,order_items, address, name , order_status
+      FROM customer_orders
+      WHERE DATE(received_date) BETWEEN ? AND ?`;
+    const results = await new Promise((resolve, reject) => {
+      db.query(sql, [startDate, endDate], (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
+    const processedResults = results.map((result) => {
+      const orderItems = JSON.parse(result.order_items); 
+
+      const gst5Sum = orderItems
+        .filter((item) => item.gst === 5) // Filter for gst = 5
+        .reduce(
+          (sum, item) =>
+            sum + (item.quantity * item.price) / (item.gstValue / 100),
+          0
+        ); // Sum gstValue
+
+      const gst12Sum = orderItems
+        .filter((item) => item.gst === 12) // Filter for gst = 12
+        .reduce(
+          (sum, item) =>
+            sum + (item.quantity * item.price) / (item.gstValue / 100),
+          0
+        ); // Sum gstValue
+
+      return {
+        ...result, // Spread existing fields
+        gst5: gst5Sum, // Add GST sum for 5%
+        gst12: gst12Sum, // Add GST sum for 12%
+      };
+    });
+    return res.status(200).json({ status: true, result: processedResults });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ status: false, message: "error in getting order report" });
+  }
+};

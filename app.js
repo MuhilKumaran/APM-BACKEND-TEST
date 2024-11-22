@@ -1,3 +1,5 @@
+const dotenv = require("dotenv");
+dotenv.config({ path: "./config.env" });
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -10,7 +12,6 @@ const menuRoutes = require("./Routes/menuRoutes");
 const adminRoutes = require("./Routes/adminRoutes");
 const pincode = require("./Modules/validPincode");
 const path = require("path");
-const pdf = require("html-pdf");
 const axios = require("axios");
 const featueRoutes = require("./Routes/featureRoutes");
 app.use(
@@ -19,8 +20,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:3000",
       "https://annapoorna-mithais.onrender.com",
-      "https://www.annapoornamithai.com/",
-      "https://annapoorna-test-backend.onrender.com",
+      "https://www.tst.annapoornamithai.com/",
     ], // or your production frontend URL
     credentials: true,
   })
@@ -46,4 +46,7 @@ app.use("/customers", customerRoutes);
 app.use("/admin", adminRoutes);
 app.use("/feature", featueRoutes);
 
-module.exports = app;
+const port = 8000;
+app.listen(port, () => {
+  console.log("App running on port " + port);
+});

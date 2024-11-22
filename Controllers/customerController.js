@@ -447,7 +447,7 @@ exports.verifyOrder = async (req, res) => {
       const isCancel = true;
       const cancellation = isCancel ? 1 : 0;
       const sql =
-        "INSERT INTO customer_orders (transaction_id, name, mobile, address,order_items,total_price,received_date,preorder_date,payment_status,order_status,user_mobile,customer_cancellation,razorpay_payment_id,razorpay_order_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        "INSERT INTO customer_orders (transaction_id, name, mobile, address,order_items,total_price,received_date,preorder_date,payment_status,order_status,user_mobile,customer_cancellation,razorpay_payment_id,razorpay_order_id,delivery_fee) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       const result = await new Promise((resolve, reject) => {
         db.query(
           sql,
@@ -466,6 +466,7 @@ exports.verifyOrder = async (req, res) => {
             cancellation,
             paymentId,
             razorpayOrderId,
+            delivery
           ],
           (err, result) => {
             if (err) {
