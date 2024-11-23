@@ -58,9 +58,7 @@ exports.getPrice = async (req, res) => {
     req.body;
 
   const taxAmount = (totalAmount * taxPercentage) / 100;
-
   const discountAmount = (totalAmount * discountPercentage) / 100;
-
   const finalAmount = totalAmount + taxAmount - discountAmount + deliveryFee;
 
   res.json({
@@ -365,6 +363,7 @@ exports.downloadReport = async (req, res) => {
 //       .json({ status: false, message: "error in getting order report" });
 //   }
 // };
+
 exports.orderReport = async (req, res) => {
   try {
     const { startDate, endDate } = req.body;
@@ -374,7 +373,7 @@ exports.orderReport = async (req, res) => {
         .json({ status: false, message: "Please provide all dates" });
     }
     const sql = `
-      SELECT order_id, received_date, delivered_date ,order_items,delivery_fee, address, name , order_status
+      SELECT order_id, received_date, delivered_date ,order_items, delivery_fee, address, name , order_status
       FROM customer_orders
       WHERE DATE(received_date) BETWEEN ? AND ?`;
     const results = await new Promise((resolve, reject) => {
@@ -387,21 +386,18 @@ exports.orderReport = async (req, res) => {
     });
     const processedResults = results.map((result) => {
       const orderItems = result.order_items;
-
       const gst5Sum = orderItems
         .filter((item) => item.gst === 5) // Filter for gst = 5
         .reduce(
           (sum, item) => sum + item.quantity * item.price * (item.gst / 100),
           0
-        ); // Sum gstValue
-
+        );
       const gst12Sum = orderItems
         .filter((item) => item.gst === 12) // Filter for gst = 12
         .reduce(
           (sum, item) => sum + item.quantity * item.price * (item.gst / 100),
           0
         ); // Sum gstValue
-
       return {
         ...result, // Spread existing fields
         gst5: gst5Sum, // Add GST sum for 5%

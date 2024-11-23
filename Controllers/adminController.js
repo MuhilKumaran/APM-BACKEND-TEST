@@ -268,10 +268,16 @@ const sendOrderShippedEmail = async (messageData) => {
             <div class="email-body">
               <p>Hi <strong>${messageData.userName}</strong>,</p>
               <p>Good News! Your order with Order ID: <strong>${messageData.order_id}</strong> has been shipped and is on its way!</p>
+              <br>
+              <h3>Tracking URL : ${messageData.tracking_url}</h3>
+              <h3>Cosnignment Number : ${messageData.consignment_number}</h3>
               <p>Thank you for choosing <strong>Annapoorna Mithai</strong>!</p>
             </div>
             <div class="email-footer">
-              <p>If you have any questions, feel free to reach out.</p>
+              <p>
+                If you have any questions or need assistance, please feel free to
+                reach out at <a href="mailto:support@annapoornamithai.com">support@annapoornamithai.com</a>.
+              </p>
               <p>&copy; 2024 Annapoorna Mithai</p>
             </div>
           </div>
@@ -713,13 +719,15 @@ exports.manageOrder = async (req, res) => {
       mobile: orderResult.mobile,
       userName: orderResult.name,
       email: orderResult.email,
+      consignment_number: orderResult.consignment_number,
+      tracking_url: orderResult.tracking_url,
     };
     if (delivery_status === "processing") {
       orderProcessedMessage(messageData);
       // sendOrderProcessingEmail(messageData);
     } else if (delivery_status === "shipped") {
       orderShippedMessage(messageData);
-      //  sendOrderShippedEmail(messageData);
+      sendOrderShippedEmail(messageData);
     } else if (delivery_status === "delivered") {
       orderDeliveredMessage(messageData);
       // sendOrderDeliveredEmail(messageData);
